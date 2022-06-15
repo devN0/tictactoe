@@ -1,6 +1,7 @@
 package com.gamedev.tictactoe.models;
 
 import com.gamedev.tictactoe.exceptions.MultipleBotsException;
+import com.gamedev.tictactoe.exceptions.UndoOnEmptyListException;
 import com.gamedev.tictactoe.models.enums.GameStatus;
 import com.gamedev.tictactoe.models.enums.PlayerType;
 import com.gamedev.tictactoe.strategies.gamewinning_strategies.GameWinningStrategy;
@@ -18,6 +19,27 @@ public class Game {
 
     public static Builder create() {
         return new Builder();
+    }
+    public boolean undo() throws UndoOnEmptyListException{
+//        move - player,symbol,cell
+//        board - dimension, cell grid[][]
+        if(this.moves.isEmpty()){
+            throw new UndoOnEmptyListException();
+        }
+        Cell lastCell = this.moves.get(moves.size()-1).getCell();
+//        cell - row, col, symbol
+//        lastCell.setSymbol(new Symbol(' ')); instead of this create a clearCell method inside Cell class
+        lastCell.clearCell();
+        this.moves.remove(moves.size()-1);
+//        after removing the last move we also need to update the board
+        return true;
+    }
+    public boolean makeMove(Move move){
+        Cell cell = move.getCell();
+        int row = cell.getRow();
+        int col = cell.getColumn();
+        this.board.setCell(row, col, cell);
+        return true;
     }
 
     public static class Builder {
@@ -43,8 +65,17 @@ public class Game {
             return this;
         }
 
-        public Builder addGameWinningStrategies(GameWinningStrategy gameWinningStrategy) {
+        public Builder addPlayers(List<Player> players){
+            this.players.addAll(players);
+            return this;
+        }
+
+        public Builder addGameWinningStrategy(GameWinningStrategy gameWinningStrategy) {
             this.gameWinningStrategies.add(gameWinningStrategy);
+            return this;
+        }
+        public Builder addGameWinningStrategies(List<GameWinningStrategy> gameWinningStrategies){
+            this.gameWinningStrategies.addAll(gameWinningStrategies);
             return this;
         }
 
@@ -59,7 +90,7 @@ public class Game {
         }
 
         public Game build() throws MultipleBotsException{
-            if(!checkIfSingleBot()){
+            if(!checkIfSingleBot()){ // validation before object creation via builder
                 throw new MultipleBotsException();
             }
             Game game = new Game();

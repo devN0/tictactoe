@@ -5,8 +5,9 @@ import com.gamedev.tictactoe.strategies.botplaying_strategies.BotPlayingStrategy
 
 public class BotPlayer extends Player {
     private BotPlayingStrategy botPlayingStrategy;
-    BotPlayer(Symbol symbol, BotPlayingStrategy botPlayingStrategy){
+    public BotPlayer(Symbol symbol, BotPlayingStrategy botPlayingStrategy){
         super(PlayerType.BOT, symbol);
         this.botPlayingStrategy = botPlayingStrategy;
     }
+
 }
